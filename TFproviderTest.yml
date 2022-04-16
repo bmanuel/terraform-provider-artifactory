@@ -70,7 +70,11 @@ pipelines:
             - add_run_variables gitHubRepoUrl=${res_GitHubTFProviderRepoJFrog1_gitRepoRepositorySshUrl}
             - add_run_variables TFProviderRepo=$(echo ${gitHubRepoUrl} | sed -e 's/git@/@/g' -e 's/:/\//g')
             - add_run_variables repoFolder=$(echo "${res_GitHubTFProviderRepoJFrog1_gitRepoFullName}" | sed -e 's/.*\///g')
+            - pwd
+            - ls -al
             - cd ${res_GitHubTFProviderRepoJFrog1_resourcePath} # since we run it on the host, we need to manually move into the resource path
+            - pwd
+            - ls -al
             - echo "Verify the code contents merged feature branch with master branch (detached mode)"
             - git branch && ls -al
             - export PROVIDER_VERSION=$(git tag --sort=-v:refname | head -1 | sed  -n 's/v\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1.\2.\3/p')
@@ -136,8 +140,8 @@ pipelines:
             - echo "Unset ARTIFACTORY_PASSWORD, acceptance test will use ARTIFACTORY_ACCESS_TOKEN instead"
             - unset ARTIFACTORY_PASSWORD
             - export TF_ACC=true
-            - make acceptance
-            - make install
+            #- make acceptance
+            #- make install
           onSuccess:
             - echo "Success"
             #- send_notification partnersSlack --text "Terraform Provider run is completed. Version ${NEXT_PROVIDER_VERSION}."
