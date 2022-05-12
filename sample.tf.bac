@@ -3,14 +3,14 @@ terraform {
   required_providers {
     artifactory = {
       source  = "registry.terraform.io/jfrog/artifactory"
-      version = "3.1.3"
+      version = "6.6.2"
     }
   }
 }
 
-provider "artifactory" {
-  //  supply ARTIFACTORY_ACCESS_TOKEN / JFROG_ACCESS_TOKEN / ARTIFACTORY_API_KEY and ARTIFACTORY_URL / JFROG_URL as env vars
-}
+#provider "artifactory" {
+#  //  supply ARTIFACTORY_ACCESS_TOKEN / JFROG_ACCESS_TOKEN / ARTIFACTORY_API_KEY and ARTIFACTORY_URL / JFROG_URL as env vars
+#}
 
 resource "artifactory_local_bower_repository" "bower-local" {
   key         = "bower-local"
