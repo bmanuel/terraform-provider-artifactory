@@ -165,14 +165,13 @@ func ResourceArtifactoryLdapSetting() *schema.Resource {
 			}
 		}
 
-		pkr := packer.Universal(
+		packer := packer.Universal(
 			predicate.All(
-				predicate.Ignore("class", "rclass", "manager_password"),
-				predicate.SchemaHasKey(ldapSettingsSchema),
+				predicate.Ignore("class", "rclass", "manager_password"), predicate.SchemaHasKey(ldapSettingsSchema),
 			),
 		)
 
-		return diag.FromErr(pkr(&matchedLdapSetting, d))
+		return diag.FromErr(packer(&matchedLdapSetting, d))
 	}
 
 	var resourceLdapSettingsUpdate = func(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -247,7 +246,7 @@ security:
 			return diag.Errorf("failed to marshal ldap settings during Update")
 		}
 
-		err = SendConfigurationPatch(restoreRestOfLdapSettingsConfigs, m)
+		err = SendConfigurationPatch([]byte(restoreRestOfLdapSettingsConfigs), m)
 		if err != nil {
 			return diag.Errorf("failed to send PATCH request to Artifactory during restoration of Ldap Settings")
 		}
@@ -270,7 +269,7 @@ security:
 }
 
 func unpackLdapSetting(s *schema.ResourceData) LdapSetting {
-	d := &util.ResourceData{ResourceData: s}
+	d := &util.ResourceData{s}
 	ldapSetting := LdapSetting{
 		Key:                      d.GetString("key", false),
 		Enabled:                  d.GetBool("enabled", false),

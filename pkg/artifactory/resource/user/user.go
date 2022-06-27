@@ -80,7 +80,7 @@ var baseUserSchema = map[string]*schema.Schema{
 }
 
 func unpackUser(s *schema.ResourceData) User {
-	d := &util.ResourceData{ResourceData: s}
+	d := &util.ResourceData{s}
 	return User{
 		Name:                     d.GetString("name", false),
 		Email:                    d.GetString("email", false),
@@ -117,8 +117,8 @@ func packUser(user User, d *schema.ResourceData) diag.Diagnostics {
 
 const usersEndpointPath = "artifactory/api/security/users/"
 
-func resourceUserRead(_ context.Context, rd *schema.ResourceData, m interface{}) diag.Diagnostics {
-	d := &util.ResourceData{ResourceData: rd}
+func resourceUserRead(ctx context.Context, rd *schema.ResourceData, m interface{}) diag.Diagnostics {
+	d := &util.ResourceData{rd}
 
 	userName := d.Id()
 	user := &User{}
@@ -197,8 +197,8 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	return resourceUserRead(ctx, d, m)
 }
 
-func resourceUserDelete(_ context.Context, rd *schema.ResourceData, m interface{}) diag.Diagnostics {
-	d := &util.ResourceData{ResourceData: rd}
+func resourceUserDelete(ctx context.Context, rd *schema.ResourceData, m interface{}) diag.Diagnostics {
+	d := &util.ResourceData{rd}
 	userName := d.GetString("name", false)
 
 	_, err := m.(*resty.Client).R().Delete(usersEndpointPath + userName)
@@ -209,4 +209,17 @@ func resourceUserDelete(_ context.Context, rd *schema.ResourceData, m interface{
 	d.SetId("")
 
 	return nil
+}
+
+func resourceUserExists(data *schema.ResourceData, m interface{}) (bool, error) {
+	d := &util.ResourceData{data}
+	name := d.Id()
+
+	resp, err := m.(*resty.Client).R().Head(usersEndpointPath + name)
+	if err != nil && resp != nil && resp.StatusCode() == http.StatusNotFound {
+		// Do not error on 404s as this causes errors when the upstream user has been manually removed
+		return false, nil
+	}
+
+	return err == nil, err
 }

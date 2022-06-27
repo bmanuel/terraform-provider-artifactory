@@ -138,7 +138,7 @@ func validatePrivateKey(value interface{}, _ cty.Path) diag.Diagnostics {
 	return nil
 }
 
-func validatePublicKey(value interface{}, _ cty.Path) diag.Diagnostics {
+func validatePublicKey(value interface{}, path cty.Path) diag.Diagnostics {
 	var err error
 
 	stripped := strings.ReplaceAll(value.(string), "\t", "")
@@ -176,12 +176,12 @@ func stripTabs(val interface{}) string {
 	return strings.ReplaceAll(val.(string), "\t", "")
 }
 
-func ignoreEmpty(_, _, _ string, _ *schema.ResourceData) bool {
+func ignoreEmpty(_, old, new string, _ *schema.ResourceData) bool {
 	return false
 }
 
 func unpackKeyPair(s *schema.ResourceData) (interface{}, string, error) {
-	d := &util.ResourceData{ResourceData: s}
+	d := &util.ResourceData{s}
 	result := KeyPairPayLoad{
 		PairName:    d.GetString("pair_name", false),
 		PairType:    d.GetString("pair_type", false),
@@ -195,8 +195,7 @@ func unpackKeyPair(s *schema.ResourceData) (interface{}, string, error) {
 
 var keyPairPacker = packer.Universal(
 	predicate.All(
-		predicate.Ignore("private_key"),
-		predicate.SchemaHasKey(keyPairSchema),
+		predicate.Ignore("private_key"), predicate.SchemaHasKey(keyPairSchema),
 	),
 )
 

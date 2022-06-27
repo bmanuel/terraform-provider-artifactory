@@ -2,7 +2,6 @@ package federated_test
 
 import (
 	"fmt"
-	"github.com/jfrog/terraform-provider-shared/util"
 	"math/rand"
 	"os"
 	"regexp"
@@ -44,7 +43,7 @@ func TestAccFederatedRepoWithMembers(t *testing.T) {
 		"member1Url":   federatedMember1Url,
 		"member2Url":   federatedMember2Url,
 	}
-	federatedRepositoryConfig := util.ExecuteTemplate("TestAccFederatedRepositoryConfigWithMembers", `
+	federatedRepositoryConfig := acctest.ExecuteTemplate("TestAccFederatedRepositoryConfigWithMembers", `
 		resource "{{ .resourceType }}" "{{ .name }}" {
 			key         = "{{ .name }}"
 			description = "Test federated repo for {{ .name }}"
@@ -98,7 +97,7 @@ func federatedTestCase(repoType string, t *testing.T) (*testing.T, resource.Test
 		"xrayIndex":    xrayIndex,
 		"memberUrl":    federatedMemberUrl,
 	}
-	federatedRepositoryConfig := util.ExecuteTemplate("TestAccFederatedRepositoryConfig", `
+	federatedRepositoryConfig := acctest.ExecuteTemplate("TestAccFederatedRepositoryConfig", `
 		resource "{{ .resourceType }}" "{{ .name }}" {
 			key         = "{{ .name }}"
 			description = "Test federated repo for {{ .name }}"
@@ -137,7 +136,7 @@ func federatedTestCase(repoType string, t *testing.T) (*testing.T, resource.Test
 }
 
 func TestAccFederatedRepoAllTypes(t *testing.T) {
-	for _, repo := range federated.RepoTypesSupported {
+	for _, repo := range federated.FederatedRepoTypesSupported {
 		t.Run(fmt.Sprintf("TestFederated%sRepo", strings.Title(strings.ToLower(repo))), func(t *testing.T) {
 			resource.Test(federatedTestCase(repo, t))
 		})
@@ -159,7 +158,7 @@ func TestAccFederatedRepoWithProjectAttributesGH318(t *testing.T) {
 		"projectEnv": projectEnv,
 		"memberUrl":  federatedMemberUrl,
 	}
-	federatedRepositoryConfig := util.ExecuteTemplate("TestAccFederatedRepositoryConfig", `
+	federatedRepositoryConfig := acctest.ExecuteTemplate("TestAccFederatedRepositoryConfig", `
 		resource "artifactory_federated_generic_repository" "{{ .name }}" {
 			key                  = "{{ .name }}"
 			project_key          = "{{ .projectKey }}"
@@ -211,7 +210,7 @@ func TestAccFederatedRepositoryWithInvalidProjectKeyGH318(t *testing.T) {
 		"projectKey": projectKey,
 		"memberUrl":  federatedMemberUrl,
 	}
-	federatedRepositoryConfig := util.ExecuteTemplate("TestAccFederatedRepositoryConfig", `
+	federatedRepositoryConfig := acctest.ExecuteTemplate("TestAccFederatedRepositoryConfig", `
 		resource "artifactory_federated_generic_repository" "{{ .name }}" {
 			key         = "{{ .name }}"
 		 	project_key = "invalid-project-key"
@@ -248,7 +247,7 @@ func TestAccFederatedAlpineRepository(t *testing.T) {
 
 	federatedMemberUrl := fmt.Sprintf("%s/artifactory/%s", acctest.GetArtifactoryUrl(t), name)
 
-	federatedRepositoryBasic := util.ExecuteTemplate("keypair", `
+	federatedRepositoryBasic := acctest.ExecuteTemplate("keypair", `
 		resource "artifactory_keypair" "{{ .kp_name }}" {
 			pair_name  = "{{ .kp_name }}"
 			pair_type = "RSA"
@@ -348,7 +347,7 @@ func TestAccFederatedCargoRepository(t *testing.T) {
 		"name":             name,
 		"memberUrl":        federatedMemberUrl,
 	}
-	federatedRepositoryBasic := util.ExecuteTemplate("TestAccFederatedCargoRepository", `
+	federatedRepositoryBasic := acctest.ExecuteTemplate("TestAccFederatedCargoRepository", `
 		resource "artifactory_federated_cargo_repository" "{{ .name }}" {
 			key              = "{{ .name }}"
 			anonymous_access = {{ .anonymous_access }}
@@ -383,7 +382,7 @@ func TestAccFederatedDebianRepository(t *testing.T) {
 
 	federatedMemberUrl := fmt.Sprintf("%s/artifactory/%s", acctest.GetArtifactoryUrl(t), name)
 
-	federatedRepositoryBasic := util.ExecuteTemplate("keypair", `
+	federatedRepositoryBasic := acctest.ExecuteTemplate("keypair", `
 		resource "artifactory_keypair" "{{ .kp_name }}" {
 			pair_name  = "{{ .kp_name }}"
 			pair_type = "GPG"
@@ -540,7 +539,7 @@ func TestAccFederatedDockerRepository(t *testing.T) {
 		"name":      name,
 		"memberUrl": federatedMemberUrl,
 	}
-	federatedRepositoryBasic := util.ExecuteTemplate("TestAccFederatedDockerRepository", `
+	federatedRepositoryBasic := acctest.ExecuteTemplate("TestAccFederatedDockerRepository", `
 		resource "artifactory_federated_docker_repository" "{{ .name }}" {
 			key 	               = "{{ .name }}"
 			tag_retention          = {{ .retention }}
@@ -583,7 +582,7 @@ func TestAccFederatedNugetRepository(t *testing.T) {
 		"name":                       name,
 		"memberUrl":                  federatedMemberUrl,
 	}
-	federatedRepositoryBasic := util.ExecuteTemplate("TestAccLocalNugetRepository", `
+	federatedRepositoryBasic := acctest.ExecuteTemplate("TestAccLocalNugetRepository", `
 		resource "artifactory_federated_nuget_repository" "{{ .name }}" {
 			key                        = "{{ .name }}"
 			max_unique_snapshots       = {{ .max_unique_snapshots }}
@@ -655,7 +654,7 @@ func TestAccFederatedMavenRepository(t *testing.T) {
 		CheckDestroy:      acctest.VerifyDeleted(fqrn, acctest.CheckRepo),
 		Steps: []resource.TestStep{
 			{
-				Config: util.ExecuteTemplate(fqrn, federatedJavaRepositoryBasic, tempStruct),
+				Config: acctest.ExecuteTemplate(fqrn, federatedJavaRepositoryBasic, tempStruct),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(fqrn, "key", name),
 					resource.TestCheckResourceAttr(fqrn, "checksum_policy_type", fmt.Sprintf("%s", tempStruct["checksum_policy_type"])),
@@ -689,7 +688,7 @@ func makeFederatedGradleLikeRepoTestCase(repoType string, t *testing.T) (*testin
 		CheckDestroy:      acctest.VerifyDeleted(fqrn, acctest.CheckRepo),
 		Steps: []resource.TestStep{
 			{
-				Config: util.ExecuteTemplate(fqrn, federatedJavaRepositoryBasic, tempStruct),
+				Config: acctest.ExecuteTemplate(fqrn, federatedJavaRepositoryBasic, tempStruct),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(fqrn, "key", name),
 					resource.TestCheckResourceAttr(fqrn, "checksum_policy_type", fmt.Sprintf("%s", tempStruct["checksum_policy_type"])),
@@ -719,7 +718,7 @@ func TestAccFederatedRpmRepository(t *testing.T) {
 
 	federatedMemberUrl := fmt.Sprintf("%s/artifactory/%s", acctest.GetArtifactoryUrl(t), name)
 
-	federatedRepositoryBasic := util.ExecuteTemplate("keypair", `
+	federatedRepositoryBasic := acctest.ExecuteTemplate("keypair", `
 		resource "artifactory_keypair" "{{ .kp_name }}" {
 			pair_name  = "{{ .kp_name }}"
 			pair_type = "GPG"

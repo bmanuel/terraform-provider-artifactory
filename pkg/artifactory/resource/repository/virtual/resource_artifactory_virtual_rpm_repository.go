@@ -33,15 +33,15 @@ func ResourceArtifactoryVirtualRpmRepository() *schema.Resource {
 	}
 
 	type RpmVirtualRepositoryParams struct {
-		RepositoryBaseParams
+		VirtualRepositoryBaseParams
 		CommonRpmDebianVirtualRepositoryParams
 	}
 
 	var unpackRpmVirtualRepository = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 
 		repo := RpmVirtualRepositoryParams{
-			RepositoryBaseParams: UnpackBaseVirtRepo(s, "rpm"),
+			VirtualRepositoryBaseParams: UnpackBaseVirtRepo(s, "rpm"),
 			CommonRpmDebianVirtualRepositoryParams: CommonRpmDebianVirtualRepositoryParams{
 				PrimaryKeyPairRef:   d.GetString("primary_keypair_ref", false),
 				SecondaryKeyPairRef: d.GetString("secondary_keypair_ref", false),
@@ -54,7 +54,7 @@ func ResourceArtifactoryVirtualRpmRepository() *schema.Resource {
 
 	return repository.MkResourceSchema(rpmVirtualSchema, packer.Default(rpmVirtualSchema), unpackRpmVirtualRepository, func() interface{} {
 		return &RpmVirtualRepositoryParams{
-			RepositoryBaseParams: RepositoryBaseParams{
+			VirtualRepositoryBaseParams: VirtualRepositoryBaseParams{
 				Rclass:      "virtual",
 				PackageType: packageType,
 			},

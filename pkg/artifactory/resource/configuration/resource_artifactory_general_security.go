@@ -39,7 +39,7 @@ func ResourceArtifactoryGeneralSecurity() *schema.Resource {
 	}
 }
 
-func resourceGeneralSecurityRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceGeneralSecurityRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	c := m.(*resty.Client)
 
 	generalSettings := GeneralSettings{}
@@ -96,7 +96,7 @@ security:
 }
 
 func unpackGeneralSecurity(s *schema.ResourceData) *GeneralSecurity {
-	d := &util.ResourceData{ResourceData: s}
+	d := &util.ResourceData{s}
 	security := *new(GeneralSecurity)
 
 	settings := GeneralSettings{

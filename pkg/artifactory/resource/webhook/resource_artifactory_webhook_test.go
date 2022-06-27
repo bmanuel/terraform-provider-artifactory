@@ -3,7 +3,6 @@ package webhook_test
 import (
 	"context"
 	"fmt"
-	"github.com/jfrog/terraform-provider-shared/util"
 	"reflect"
 	"regexp"
 	"strings"
@@ -80,7 +79,7 @@ var releaseBundleTemplate = `
 `
 
 func TestAccWebhookCriteriaValidation(t *testing.T) {
-	for _, webhookType := range webhook.TypesSupported {
+	for _, webhookType := range webhook.WebhookTypesSupported {
 		t.Run(fmt.Sprintf("TestWebhook%sCriteriaValidation", strings.Title(strings.ToLower(webhookType))), func(t *testing.T) {
 			resource.Test(webhookCriteriaValidationTestCase(webhookType, t))
 		})
@@ -107,7 +106,7 @@ func webhookCriteriaValidationTestCase(webhookType string, t *testing.T) (*testi
 		"webhookName": name,
 		"eventTypes":  webhook.DomainEventTypesSupported[webhookType],
 	}
-	webhookConfig := util.ExecuteTemplate("TestAccWebhookCriteriaValidation", template, params)
+	webhookConfig := acctest.ExecuteTemplate("TestAccWebhookCriteriaValidation", template, params)
 
 	return t, resource.TestCase{
 		PreCheck:          func() { acctest.PreCheck(t) },
@@ -134,7 +133,7 @@ func TestAccWebhookEventTypesValidation(t *testing.T) {
 		"webhookName": name,
 		"eventType":   wrongEventType,
 	}
-	webhookConfig := util.ExecuteTemplate("TestAccWebhookEventTypesValidation", `
+	webhookConfig := acctest.ExecuteTemplate("TestAccWebhookEventTypesValidation", `
 		resource "artifactory_artifact_webhook" "{{ .webhookName }}" {
 			key         = "{{ .webhookName }}"
 			description = "test description"
@@ -172,7 +171,7 @@ func TestAccWebhookHandlerValidation_EmptyProxy(t *testing.T) {
 	params := map[string]interface{}{
 		"webhookName": name,
 	}
-	webhookConfig := util.ExecuteTemplate("TestAccWebhookEventTypesValidation", `
+	webhookConfig := acctest.ExecuteTemplate("TestAccWebhookEventTypesValidation", `
 		resource "artifactory_artifact_webhook" "{{ .webhookName }}" {
 			key         = "{{ .webhookName }}"
 			description = "test description"
@@ -211,7 +210,7 @@ func TestAccWebhookHandlerValidation_ProxyWithURL(t *testing.T) {
 	params := map[string]interface{}{
 		"webhookName": name,
 	}
-	webhookConfig := util.ExecuteTemplate("TestAccWebhookEventTypesValidation", `
+	webhookConfig := acctest.ExecuteTemplate("TestAccWebhookEventTypesValidation", `
 		resource "artifactory_artifact_webhook" "{{ .webhookName }}" {
 			key         = "{{ .webhookName }}"
 			description = "test description"
@@ -270,7 +269,7 @@ func webhookTestCase(webhookType string, t *testing.T) (*testing.T, resource.Tes
 		"anyLocal":    test.RandBool(),
 		"anyRemote":   test.RandBool(),
 	}
-	webhookConfig := util.ExecuteTemplate("TestAccWebhook{{ .webhookType }}Type", `
+	webhookConfig := acctest.ExecuteTemplate("TestAccWebhook{{ .webhookType }}Type", `
 		resource "artifactory_local_{{ .repoType }}_repository" "{{ .repoName }}" {
 			key = "{{ .repoName }}"
 		}
@@ -354,7 +353,7 @@ func testCheckWebhook(id string, request *resty.Request) (*resty.Response, error
 	return request.
 		SetPathParam("webhookKey", id).
 		AddRetryCondition(client.NeverRetry).
-		Get(webhook.WhUrl)
+		Get(webhook.WebhookUrl)
 }
 
 // Unit tests for state migration func

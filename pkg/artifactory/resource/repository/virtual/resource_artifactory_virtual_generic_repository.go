@@ -9,7 +9,7 @@ import (
 
 func ResourceArtifactoryVirtualGenericRepository(pkt string) *schema.Resource {
 	constructor := func() interface{} {
-		return &RepositoryBaseParams{
+		return &VirtualRepositoryBaseParams{
 			PackageType: pkt,
 			Rclass:      "virtual",
 		}
@@ -32,8 +32,8 @@ func ResourceArtifactoryVirtualRepositoryWithRetrievalCachePeriodSecs(pkt string
 	)
 
 	constructor := func() interface{} {
-		return &RepositoryBaseParamsWithRetrievalCachePeriodSecs{
-			RepositoryBaseParams: RepositoryBaseParams{
+		return &VirtualRepositoryBaseParamsWithRetrievalCachePeriodSecs{
+			VirtualRepositoryBaseParams: VirtualRepositoryBaseParams{
 				Rclass:      "virtual",
 				PackageType: pkt,
 			},

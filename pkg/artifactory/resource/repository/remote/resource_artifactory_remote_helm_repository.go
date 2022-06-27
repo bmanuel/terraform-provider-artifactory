@@ -41,16 +41,16 @@ func ResourceArtifactoryRemoteHelmRepository() *schema.Resource {
 	}, repository.RepoLayoutRefSchema("remote", packageType))
 
 	type HelmRemoteRepo struct {
-		RepositoryBaseParams
+		RemoteRepositoryBaseParams
 		HelmChartsBaseURL            string   `hcl:"helm_charts_base_url" json:"chartsBaseUrl"`
 		ExternalDependenciesEnabled  bool     `hcl:"external_dependencies_enabled" json:"externalDependenciesEnabled"`
 		ExternalDependenciesPatterns []string `hcl:"external_dependencies_patterns" json:"externalDependenciesPatterns"`
 	}
 
 	var unpackHelmRemoteRepo = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 		repo := HelmRemoteRepo{
-			RepositoryBaseParams:         UnpackBaseRemoteRepo(s, packageType),
+			RemoteRepositoryBaseParams:   UnpackBaseRemoteRepo(s, packageType),
 			HelmChartsBaseURL:            d.GetString("helm_charts_base_url", false),
 			ExternalDependenciesEnabled:  d.GetBool("external_dependencies_enabled", false),
 			ExternalDependenciesPatterns: d.GetList("external_dependencies_patterns"),
@@ -66,14 +66,13 @@ func ResourceArtifactoryRemoteHelmRepository() *schema.Resource {
 		predicate.All(
 			predicate.SchemaHasKey(helmRemoteSchema),
 			predicate.NoPassword,
-			predicate.NoClass,
 			predicate.Ignore("external_dependencies_patterns"),
 		),
 	)
 
 	return repository.MkResourceSchema(helmRemoteSchema, helmRemoteRepoPacker, unpackHelmRemoteRepo, func() interface{} {
 		return &HelmRemoteRepo{
-			RepositoryBaseParams: RepositoryBaseParams{
+			RemoteRepositoryBaseParams: RemoteRepositoryBaseParams{
 				Rclass:      "remote",
 				PackageType: packageType,
 			},

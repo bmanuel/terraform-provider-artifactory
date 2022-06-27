@@ -24,7 +24,7 @@ func ResourceArtifactoryVirtualNpmRepository() *schema.Resource {
 	}
 
 	var unpackNpmVirtualRepository = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 
 		repo := NpmVirtualRepositoryParams{
 			VirtualRetrievalCachePeriodSecs:             d.GetInt("retrieval_cache_period_seconds", false),
@@ -40,7 +40,7 @@ func ResourceArtifactoryVirtualNpmRepository() *schema.Resource {
 		func() interface{} {
 			return &NpmVirtualRepositoryParams{
 				ExternalDependenciesVirtualRepositoryParams: ExternalDependenciesVirtualRepositoryParams{
-					RepositoryBaseParams: RepositoryBaseParams{
+					VirtualRepositoryBaseParams: VirtualRepositoryBaseParams{
 						Rclass:      "virtual",
 						PackageType: packageType,
 					},

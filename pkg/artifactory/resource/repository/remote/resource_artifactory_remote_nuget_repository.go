@@ -9,7 +9,7 @@ import (
 )
 
 type NugetRemoteRepo struct {
-	RepositoryBaseParams
+	RemoteRepositoryBaseParams
 	FeedContextPath          string `json:"feedContextPath"`
 	DownloadContextPath      string `json:"downloadContextPath"`
 	V3FeedUrl                string `hcl:"v3_feed_url" json:"v3FeedUrl"` // Forced to specify hcl tag because predicate is not parsed by packer.Universal function.
@@ -49,13 +49,13 @@ func ResourceArtifactoryRemoteNugetRepository() *schema.Resource {
 	}, repository.RepoLayoutRefSchema("remote", packageType))
 
 	var unpackNugetRemoteRepo = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 		repo := NugetRemoteRepo{
-			RepositoryBaseParams:     UnpackBaseRemoteRepo(s, packageType),
-			FeedContextPath:          d.GetString("feed_context_path", false),
-			DownloadContextPath:      d.GetString("download_context_path", false),
-			V3FeedUrl:                d.GetString("v3_feed_url", false),
-			ForceNugetAuthentication: d.GetBool("force_nuget_authentication", false),
+			RemoteRepositoryBaseParams: UnpackBaseRemoteRepo(s, packageType),
+			FeedContextPath:            d.GetString("feed_context_path", false),
+			DownloadContextPath:        d.GetString("download_context_path", false),
+			V3FeedUrl:                  d.GetString("v3_feed_url", false),
+			ForceNugetAuthentication:   d.GetBool("force_nuget_authentication", false),
 		}
 		return repo, repo.Id(), nil
 	}
@@ -63,7 +63,7 @@ func ResourceArtifactoryRemoteNugetRepository() *schema.Resource {
 	return repository.MkResourceSchema(nugetRemoteSchema, packer.Default(nugetRemoteSchema), unpackNugetRemoteRepo, func() interface{} {
 		repoLayout, _ := repository.GetDefaultRepoLayoutRef("remote", packageType)()
 		return &NugetRemoteRepo{
-			RepositoryBaseParams: RepositoryBaseParams{
+			RemoteRepositoryBaseParams: RemoteRepositoryBaseParams{
 				Rclass:              "remote",
 				PackageType:         packageType,
 				RemoteRepoLayoutRef: repoLayout.(string),

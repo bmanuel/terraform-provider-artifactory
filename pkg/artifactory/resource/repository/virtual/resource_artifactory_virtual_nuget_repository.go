@@ -21,16 +21,16 @@ func ResourceArtifactoryVirtualNugetRepository() *schema.Resource {
 	}, repository.RepoLayoutRefSchema("virtual", packageType))
 
 	type NugetVirtualRepositoryParams struct {
-		RepositoryBaseParams
+		VirtualRepositoryBaseParams
 		ForceNugetAuthentication bool `json:"forceNugetAuthentication"`
 	}
 
 	var unpackNugetVirtualRepository = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 
 		repo := NugetVirtualRepositoryParams{
-			RepositoryBaseParams:     UnpackBaseVirtRepo(s, packageType),
-			ForceNugetAuthentication: d.GetBool("force_nuget_authentication", false),
+			VirtualRepositoryBaseParams: UnpackBaseVirtRepo(s, packageType),
+			ForceNugetAuthentication:    d.GetBool("force_nuget_authentication", false),
 		}
 		repo.PackageType = packageType
 		return &repo, repo.Key, nil
@@ -38,7 +38,7 @@ func ResourceArtifactoryVirtualNugetRepository() *schema.Resource {
 
 	return repository.MkResourceSchema(nugetVirtualSchema, packer.Default(nugetVirtualSchema), unpackNugetVirtualRepository, func() interface{} {
 		return &NugetVirtualRepositoryParams{
-			RepositoryBaseParams: RepositoryBaseParams{
+			VirtualRepositoryBaseParams: VirtualRepositoryBaseParams{
 				Rclass:      "virtual",
 				PackageType: packageType,
 			},

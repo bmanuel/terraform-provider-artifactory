@@ -30,7 +30,7 @@ func ResourceArtifactoryLocalTerraformRepository(registryType string) *schema.Re
 		packer.Default(terraformLocalSchema),
 		unPackLocalTerraformRepository,
 		func() interface{} {
-			return &RepositoryBaseParams{
+			return &LocalRepositoryBaseParams{
 				PackageType: "terraform_" + registryType,
 				Rclass:      "local",
 			}

@@ -26,9 +26,10 @@ func ResourceArtifactoryUser() *schema.Resource {
 		ReadContext:   resourceUserRead,
 		UpdateContext: resourceUserUpdate,
 		DeleteContext: resourceUserDelete,
+		Exists:        resourceUserExists,
 
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: userSchema,

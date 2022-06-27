@@ -13,7 +13,7 @@ func getGenericRepoSchema(repoType string) map[string]*schema.Schema {
 
 func ResourceArtifactoryLocalGenericRepository(repoType string) *schema.Resource {
 	constructor := func() interface{} {
-		return &RepositoryBaseParams{
+		return &LocalRepositoryBaseParams{
 			PackageType: repoType,
 			Rclass:      "local",
 		}

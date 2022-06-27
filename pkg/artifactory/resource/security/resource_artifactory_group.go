@@ -112,7 +112,7 @@ func ResourceArtifactoryGroup() *schema.Resource {
 		DeleteContext: resourceGroupDelete,
 
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: groupSchema,
@@ -182,7 +182,7 @@ func resourceGroupCreate(ctx context.Context, d *schema.ResourceData, m interfac
 	return nil
 }
 
-func resourceGroupRead(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+func resourceGroupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	_, includeUsers, err := groupParams(d)
 	if err != nil {
 		return diag.FromErr(err)
@@ -203,9 +203,9 @@ func resourceGroupRead(_ context.Context, d *schema.ResourceData, m interface{})
 		return diag.FromErr(err)
 	}
 
-	pkr := packer.Universal(predicate.SchemaHasKey(groupSchema))
+	packer := packer.Universal(predicate.SchemaHasKey(groupSchema))
 
-	return diag.FromErr(pkr(&group, d))
+	return diag.FromErr(packer(&group, d))
 }
 
 func resourceGroupUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

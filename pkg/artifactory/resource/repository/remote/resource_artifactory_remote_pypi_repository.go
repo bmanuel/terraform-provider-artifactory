@@ -29,24 +29,24 @@ func ResourceArtifactoryRemotePypiRepository() *schema.Resource {
 	}, repository.RepoLayoutRefSchema("remote", packageType))
 
 	type PypiRemoteRepo struct {
-		RepositoryBaseParams
+		RemoteRepositoryBaseParams
 		PypiRegistryUrl      string `json:"pyPIRegistryUrl"`
 		PypiRepositorySuffix string `json:"pyPIRepositorySuffix"`
 	}
 
 	var unpackPypiRemoteRepo = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 		repo := PypiRemoteRepo{
-			RepositoryBaseParams: UnpackBaseRemoteRepo(s, packageType),
-			PypiRegistryUrl:      d.GetString("pypi_registry_url", false),
-			PypiRepositorySuffix: d.GetString("pypi_repository_suffix", false),
+			RemoteRepositoryBaseParams: UnpackBaseRemoteRepo(s, packageType),
+			PypiRegistryUrl:            d.GetString("pypi_registry_url", false),
+			PypiRepositorySuffix:       d.GetString("pypi_repository_suffix", false),
 		}
 		return repo, repo.Id(), nil
 	}
 
 	return repository.MkResourceSchema(pypiRemoteSchema, packer.Default(pypiRemoteSchema), unpackPypiRemoteRepo, func() interface{} {
 		return &PypiRemoteRepo{
-			RepositoryBaseParams: RepositoryBaseParams{
+			RemoteRepositoryBaseParams: RemoteRepositoryBaseParams{
 				Rclass:      "remote",
 				PackageType: packageType,
 			},

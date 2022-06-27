@@ -2,7 +2,6 @@ package replication_test
 
 import (
 	"fmt"
-	"github.com/jfrog/terraform-provider-shared/util"
 	"log"
 	"regexp"
 	"testing"
@@ -146,7 +145,7 @@ func TestAccSingleReplication_withDelRepo(t *testing.T) {
 
 func TestAccSingleReplicationRemoteRepo(t *testing.T) {
 	_, fqrn, name := acctest.MkNames("lib-remote", "artifactory_single_replication_config")
-	_, fqrepoName, repoName := acctest.MkNames("lib-remote", "artifactory_remote_maven_repository")
+	_, fqrepoName, repo_name := acctest.MkNames("lib-remote", "artifactory_remote_maven_repository")
 	var tcl = `
 		resource "artifactory_remote_maven_repository" "{{ .remote_name }}" {
 			key 				  = "{{ .remote_name }}"
@@ -163,9 +162,9 @@ func TestAccSingleReplicationRemoteRepo(t *testing.T) {
 			depends_on = [artifactory_remote_maven_repository.{{ .remote_name }}]
 		}
 	`
-	tcl = util.ExecuteTemplate("foo", tcl, map[string]string{
+	tcl = acctest.ExecuteTemplate("foo", tcl, map[string]string{
 		"repoconfig_name": name,
-		"remote_name":     repoName,
+		"remote_name":     repo_name,
 		"username":        acctest.RtDefaultUser,
 	})
 
@@ -181,7 +180,7 @@ func TestAccSingleReplicationRemoteRepo(t *testing.T) {
 			{
 				Config: tcl,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(fqrn, "repo_key", repoName),
+					resource.TestCheckResourceAttr(fqrn, "repo_key", repo_name),
 					resource.TestCheckResourceAttr(fqrn, "cron_exp", "0 0 12 ? * MON *"),
 					resource.TestCheckResourceAttr(fqrn, "enable_event_replication", "false"),
 					resource.TestCheckResourceAttr(fqrn, "enabled", "false"),

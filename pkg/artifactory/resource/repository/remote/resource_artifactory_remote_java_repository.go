@@ -61,7 +61,7 @@ func ResourceArtifactoryRemoteJavaRepository(repoType string, suppressPom bool) 
 	}, repository.RepoLayoutRefSchema("remote", repoType))
 
 	type JavaRemoteRepo struct {
-		RepositoryBaseParams
+		RemoteRepositoryBaseParams
 		FetchJarsEagerly             bool   `json:"fetchJarsEagerly"`
 		FetchSourcesEagerly          bool   `json:"fetchSourcesEagerly"`
 		RemoteRepoChecksumPolicyType string `json:"remoteRepoChecksumPolicyType"`
@@ -74,7 +74,7 @@ func ResourceArtifactoryRemoteJavaRepository(repoType string, suppressPom bool) 
 	var unpackJavaRemoteRepo = func(data *schema.ResourceData) (interface{}, string, error) {
 		d := &util.ResourceData{data}
 		repo := JavaRemoteRepo{
-			RepositoryBaseParams:         UnpackBaseRemoteRepo(data, repoType),
+			RemoteRepositoryBaseParams:   UnpackBaseRemoteRepo(data, repoType),
 			FetchJarsEagerly:             d.GetBool("fetch_jars_eagerly", false),
 			FetchSourcesEagerly:          d.GetBool("fetch_sources_eagerly", false),
 			RemoteRepoChecksumPolicyType: d.GetString("remote_repo_checksum_policy_type", false),
@@ -88,7 +88,7 @@ func ResourceArtifactoryRemoteJavaRepository(repoType string, suppressPom bool) 
 
 	return repository.MkResourceSchema(javaRemoteSchema, packer.Default(javaRemoteSchema), unpackJavaRemoteRepo, func() interface{} {
 		return &JavaRemoteRepo{
-			RepositoryBaseParams: RepositoryBaseParams{
+			RemoteRepositoryBaseParams: RemoteRepositoryBaseParams{
 				Rclass:      "remote",
 				PackageType: repoType,
 			},

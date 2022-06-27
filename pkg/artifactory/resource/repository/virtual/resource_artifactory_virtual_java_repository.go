@@ -15,7 +15,7 @@ type CommonJavaVirtualRepositoryParams struct {
 }
 
 type JavaVirtualRepositoryParams struct {
-	RepositoryBaseParams
+	VirtualRepositoryBaseParams
 	CommonJavaVirtualRepositoryParams
 }
 
@@ -48,10 +48,10 @@ func ResourceArtifactoryVirtualJavaRepository(repoType string) *schema.Resource 
 	}, repository.RepoLayoutRefSchema("virtual", repoType))
 
 	var unpackMavenVirtualRepository = func(s *schema.ResourceData) (interface{}, string, error) {
-		d := &util.ResourceData{ResourceData: s}
+		d := &util.ResourceData{s}
 
 		repo := JavaVirtualRepositoryParams{
-			RepositoryBaseParams: UnpackBaseVirtRepo(s, repoType),
+			VirtualRepositoryBaseParams: UnpackBaseVirtRepo(s, repoType),
 			CommonJavaVirtualRepositoryParams: CommonJavaVirtualRepositoryParams{
 				KeyPair:                              d.GetString("key_pair", false),
 				ForceMavenAuthentication:             d.GetBool("force_maven_authentication", false),
@@ -65,7 +65,7 @@ func ResourceArtifactoryVirtualJavaRepository(repoType string) *schema.Resource 
 
 	return repository.MkResourceSchema(mavenVirtualSchema, packer.Default(mavenVirtualSchema), unpackMavenVirtualRepository, func() interface{} {
 		return &JavaVirtualRepositoryParams{
-			RepositoryBaseParams: RepositoryBaseParams{
+			VirtualRepositoryBaseParams: VirtualRepositoryBaseParams{
 				Rclass:      "virtual",
 				PackageType: repoType,
 			},

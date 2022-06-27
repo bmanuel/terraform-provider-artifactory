@@ -42,7 +42,7 @@ func ResourceArtifactorySamlSettings() *schema.Resource {
 		ReadContext:   resourceSamlSettingsRead,
 
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			State: schema.ImportStatePassthrough,
 		},
 
 		Schema: map[string]*schema.Schema{
@@ -182,7 +182,7 @@ security:
 }
 
 func unpackSamlSecurity(s *schema.ResourceData) *SamlSecurity {
-	d := &util.ResourceData{ResourceData: s}
+	d := &util.ResourceData{s}
 	security := *new(SamlSecurity)
 
 	settings := SamlSettings{

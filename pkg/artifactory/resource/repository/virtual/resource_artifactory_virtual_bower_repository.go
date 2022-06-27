@@ -28,7 +28,7 @@ func ResourceArtifactoryVirtualBowerRepository() *schema.Resource {
 		unpackBowerVirtualRepository,
 		func() interface{} {
 			return &ExternalDependenciesVirtualRepositoryParams{
-				RepositoryBaseParams: RepositoryBaseParams{
+				VirtualRepositoryBaseParams: VirtualRepositoryBaseParams{
 					Rclass:      "virtual",
 					PackageType: packageType,
 				},
